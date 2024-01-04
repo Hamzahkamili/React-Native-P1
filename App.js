@@ -1,15 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View , Button, TextInput} from 'react-native';
+import {useState} from 'react';
+import { StyleSheet, Text, View , Button, TextInput, FlatList} from 'react-native';
+import GoalItem from './components/GoaItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
+
+ 
+  const [newGoals,setCourseGoals]= useState([]);
+  const [modalVisibility,setVisibility]=useState(false)
+
+  function addModalHandler(){
+    setVisibility(true)
+  }
+ 
+  function setGoalTextHandler(enteredGoalText){
+    setCourseGoals(currentCourseGoals => [...currentCourseGoals,{text: enteredGoalText, id : Math.random().toString()}])
+
+  }
+ function deleteItemHandler(id){
+  setCourseGoals((currentCourseGoals=>{
+    return currentCourseGoals.filter((goal)=>goal.id !==id) // filter will drop the value if it is false
+  }))
+ }
+
   return (
     <View style={styles.appContainer}>
-     <View style={styles.inputContainer}>
-      <TextInput style={styles.textInput} placeholder='Input your goals here'></TextInput>
-      <Button title='Add Goals'/>
-     </View>
+      <Button title='Add new Modal' color={'#5e0acc'} onPress={addModalHandler}></Button>
+    <GoalInput visible={modalVisibility} addGoalItem={setGoalTextHandler}/>
      <View style={styles.goalsContainer}>
-      <Text>Your Goals!!</Text>
+      <FlatList 
+      data={newGoals}
+      renderItem={(itemData)=>{
+       return <GoalItem
+       addDeleteGoal={deleteItemHandler}
+       id={itemData.item.id}
+       text={itemData.item.text}/>}
+      }
+      keyExtractor={(item,index)=>{
+        return item.id
+      }}
+      />
+       
      </View>
     </View>
   );
@@ -21,24 +52,11 @@ const styles = StyleSheet.create({
   padding: 50,
   paddingHorizontal: 16
  },
- inputContainer : {
-  flex: 1,
- flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom : 24,
-  borderBottomWidth : 1,
-  borderBottomColor : 'gray'
- },
- textInput : {
-  borderWidth : 1,
-width: '70%',
-marginRight : 8,
-padding : 8,
-borderColor: 'gray'
- },
+
  goalsContainer : {
   flex : 4,
 
- }
+ },
+
+ 
 });
